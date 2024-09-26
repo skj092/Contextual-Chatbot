@@ -97,6 +97,17 @@ The project includes an end-to-end MLOps pipeline for model versioning, monitori
 3. Feature Engineering
 
 
-------------Solution---
+# References:
+- https://milvus.io/docs/quickstart.md
+- https://claude.ai/chat/74f3d3be-3b5b-48a6-b62d-03bca7a6a2ff
 
+--------------Progress-----------
+1. Current Flow
 
+pdf -> Extract Text -> Chunking -> Embedding -> Save to DB
+query -> Embedding -> Search in DB -> Retrieve Chunks -> Generate Response
+
+api call
+```bash
+
+```
