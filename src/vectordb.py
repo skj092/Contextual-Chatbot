@@ -3,6 +3,11 @@ from typing import List
 from src.models import model, tokenizer, gpt_model
 import torch
 from src.utils import log_execution_time, device
+import time
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 
 
@@ -24,17 +29,34 @@ def store_chunks(chunks: List[str]):
 
 @log_execution_time
 def semantic_search(query: str, top_k: int = 3) -> List[str]:
+    tik = time.time()
     query_embedding = model.encode([query])
+    tok = time.time()
+    logger.info(f"Time taken to encode query: {tok-tik}")
     search_params = {"metric_type": "L2", "params": {"nprobe": 10}}
+    tik = time.time()
     results = client.search(collection_name="document_chunks", data=query_embedding, limit=top_k, output_fields=["text"])
+    tok = time.time()
+    logger.info(f"Time taken to search: {tok-tik}")
     return [hit.get('entity').get('text') for hit in results[0]]
 
 @log_execution_time
 def generate_response(query: str, context: List[str]) -> str:
     prompt = f"Context: {' '.join(context)}\n\nQuestion: {query}\n\nAnswer:"
+    tik = time.time()
     input_ids = tokenizer.encode(prompt, return_tensors="pt").to(device)
+    tok = time.time()
+    logger.info(f"Time taken to encode prompt: {tok-tik}")
     attention_mask = torch.ones(input_ids.shape, device=device)
+
+    tik = time.time()
     output = gpt_model.generate(input_ids, max_length=1279, num_return_sequences=1, attention_mask=attention_mask)
+    tok = time.time()
+    logger.info(f"Time taken to generate response: {tok-tik}")
+
+    tik = time.time()
     response = tokenizer.decode(output[0], skip_special_tokens=True)
+    tok = time.time()
+    logger.info(f"Time taken to decode response: {tok-tik}")
     return response.split("Answer:")[-1].strip()
 

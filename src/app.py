@@ -5,6 +5,10 @@ from fastapi.responses import FileResponse
 import time
 from src.utils import (log_async_execution_time, parse_document)
 from src.vectordb import create_chunks, store_chunks, semantic_search, generate_response
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 app = FastAPI()
 
