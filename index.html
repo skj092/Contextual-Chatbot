@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contextual Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #file-upload, #query-form {
+            margin-bottom: 20px;
+        }
+        #chat-history {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+        }
+    </style>
+</head>
+<body>
+    <h1>Contextual Chatbot</h1>
+    <div id="file-upload">
+        <h2>Upload Document</h2>
+        <input type="file" id="document" accept=".pdf,.docx">
+        <button onclick="uploadDocument()">Upload</button>
+    </div>
+    <div id="query-form">
+        <h2>Ask a Question</h2>
+        <input type="text" id="query" placeholder="Enter your question">
+        <button onclick="submitQuery()">Submit</button>
+    </div>
+    <div id="chat-history"></div>
+
+    <script>
+        async function uploadDocument() {
+            const fileInput = document.getElementById('document');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a file to upload');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                alert(result.message);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while uploading the document');
+            }
+        }
+
+        async function submitQuery() {
+            const queryInput = document.getElementById('query');
+            const query = queryInput.value.trim();
+            if (!query) {
+                alert('Please enter a question');
+                return;
+            }
+
+            try {
+                const response = await fetch('/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text: query })
+                });
+                const result = await response.json();
+                displayMessage('User', query);
+                displayMessage('Bot', result.response);
+                queryInput.value = '';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while processing your query');
+            }
+        }
+
+        function displayMessage(sender, message) {
+            const chatHistory = document.getElementById('chat-history');
+            const messageElement = document.createElement('p');
+            messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatHistory.appendChild(messageElement);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+    </script>
+</body>
+</html>
