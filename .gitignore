@@ -2,3 +2,6 @@ data.db
 *.pyc
 *.lock
 *.db
+*.csv
+.env
+data

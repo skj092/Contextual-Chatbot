@@ -1,3 +1,24 @@
+# TODO
+- [x] Flow: pdf -> Extract Text -> Chunking -> Embedding -> Save to DB -> query -> Embedding -> Search in DB -> Retrieve Chunks -> Generate Response
+- [x] Build a boilerplate application
+- [x] Refactor the code to seperate db and model
+- [x] add logger and timer
+- [x] Setup evaluation pipeline
+- [x] Prepare question answer pairs for evaluation
+- Setup mlops pipeline, versioning
+
+
+["['sent']", ['sent']"]
+
+## Using RAGAS ( https://arxiv.org/pdf/2309.15217)
+https://docs.ragas.io/en/latest/concepts/metrics/index.html#different-types-of-metrics
+
+
+## Steps for new pdf
+1. Run `python evaluation/systhetic_data_generation.py` to generate the synthetic test question-answer pairs.
+2. Run the service and then `python evaluation/eval.py` to evaluate the service accuracy.
+
+
 Problem Statement - Contextual Chat Bot:
 
 Mandatory Requirements:
@@ -31,34 +52,6 @@ Once you are ready with the code, you can come back on this URL to submit the Gi
 
 This project implements a contextual chatbot that can answer questions based on uploaded documents. It uses FastAPI for the backend, Milvus for vector storage, and GPT-Neo for text generation.
 
-## Setup Instructions
-
-1. Clone the repository:
-   ```
-   git clone https://github.com/yourusername/qp-ai-assessment.git
-   cd qp-ai-assessment
-   ```
-
-2. Create a virtual environment and activate it:
-   ```
-   python -m venv venv
-   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-   ```
-
-3. Install the required packages:
-   ```
-   pip install fastapi uvicorn PyPDF2 python-docx sentence-transformers pymilvus torch transformers
-   ```
-
-4. Start the Milvus server:
-   Follow the instructions at https://milvus.io/docs/install_standalone-docker.md to set up Milvus using Docker.
-
-5. Run the FastAPI application:
-   ```
-   python main.py
-   ```
-
-6. Open the `index.html` file in a web browser to access the user interface.
 
 ## Usage
 
@@ -101,13 +94,3 @@ The project includes an end-to-end MLOps pipeline for model versioning, monitori
 - https://milvus.io/docs/quickstart.md
 - https://claude.ai/chat/74f3d3be-3b5b-48a6-b62d-03bca7a6a2ff
 
---------------Progress-----------
-1. Current Flow
-
-pdf -> Extract Text -> Chunking -> Embedding -> Save to DB
-query -> Embedding -> Search in DB -> Retrieve Chunks -> Generate Response
-
-api call
-```bash
-
-```

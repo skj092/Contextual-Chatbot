@@ -9,8 +9,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-
-
 # Initialize Milvus client
 client = MilvusClient("data.db")
 
@@ -23,9 +21,11 @@ def create_chunks(text: str, chunk_size: int = 1000) -> List[str]:
 @log_execution_time
 def store_chunks(chunks: List[str]):
     embeddings = model.encode(chunks)
-    entities = [{"id": i, "vector": embeddings[i], "text": chunks[i], "subject": "tag"} for i in range(len(embeddings))]
+    entities = [{"id": i, "vector": embeddings[i], "text": chunks[i],
+                 "subject": "tag"} for i in range(len(embeddings))]
     client.create_collection("document_chunks", dimension=384)
     client.insert(collection_name="document_chunks", data=entities)
+
 
 @log_execution_time
 def semantic_search(query: str, top_k: int = 3) -> List[str]:
@@ -35,10 +35,12 @@ def semantic_search(query: str, top_k: int = 3) -> List[str]:
     logger.info(f"Time taken to encode query: {tok-tik}")
     search_params = {"metric_type": "L2", "params": {"nprobe": 10}}
     tik = time.time()
-    results = client.search(collection_name="document_chunks", data=query_embedding, limit=top_k, output_fields=["text"])
+    results = client.search(collection_name="document_chunks",
+                            data=query_embedding, limit=top_k, output_fields=["text"])
     tok = time.time()
     logger.info(f"Time taken to search: {tok-tik}")
     return [hit.get('entity').get('text') for hit in results[0]]
+
 
 @log_execution_time
 def generate_response(query: str, context: List[str]) -> str:
@@ -50,7 +52,8 @@ def generate_response(query: str, context: List[str]) -> str:
     attention_mask = torch.ones(input_ids.shape, device=device)
 
     tik = time.time()
-    output = gpt_model.generate(input_ids, max_length=1279, num_return_sequences=1, attention_mask=attention_mask)
+    output = gpt_model.generate(
+        input_ids, max_length=1279, num_return_sequences=1, attention_mask=attention_mask)
     tok = time.time()
     logger.info(f"Time taken to generate response: {tok-tik}")
 
@@ -59,4 +62,3 @@ def generate_response(query: str, context: List[str]) -> str:
     tok = time.time()
     logger.info(f"Time taken to decode response: {tok-tik}")
     return response.split("Answer:")[-1].strip()
-

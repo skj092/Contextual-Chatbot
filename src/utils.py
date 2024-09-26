@@ -1,11 +1,11 @@
 import functools
 import time
 from fastapi import UploadFile, HTTPException
-import PyPDF2
 import docx
 from io import BytesIO
 import torch
 import logging
+import PyPDF2
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 

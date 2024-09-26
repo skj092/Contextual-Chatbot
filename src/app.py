@@ -3,9 +3,9 @@ from pydantic import BaseModel
 import uvicorn
 from fastapi.responses import FileResponse
 import time
-from src.utils import (log_async_execution_time, parse_document)
 from src.vectordb import create_chunks, store_chunks, semantic_search, generate_response
 import logging
+from src.utils import (log_async_execution_time, parse_document)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -41,9 +41,9 @@ async def query_document(query: Query):
     if not relevant_chunks:
         return {"response": "I don't know the answer to that question."}
     response = generate_response(query.text, relevant_chunks)
-    print(f"Question: {query.text}\nAnswer: {response}")
     tok = time.time()
-    print(f"Time taken: {tok-tik}")
+    print(f"Total tokens {len(response.split())}, Time taken: {tok-tik}")
+    print(f"Token per second: {len(response.split())/(tok-tik)}")
     return {"response": response}
 
 if __name__ == "__main__":
