@@ -87,7 +87,7 @@ def format_prompt(context: List[str], query: str, model_name: str):
     """
     Formats the prompt based on the model name.
     """
-    if model_name == "gpt2":
+    if model_name == "gpt-neo":
         return f"Context: {' '.join(context)}\n\nQuestion: {query}\n\nAnswer:"
     elif model_name == "ollama":
         return prompt.format(context=" ".join(context), question=query)
@@ -98,15 +98,18 @@ def format_prompt(context: List[str], query: str, model_name: str):
 
 
 @log_execution_time
-def generate_response(query: str, context: List[str], retrival_model: str = "gpt2"):
+def generate_response(query: str, context: List[str], retrival_model: str = "openai"):
     tik = time.time()
+    prompt = hub.pull("rlm/rag-prompt")
     prompt = format_prompt(context, query, retrival_model)
-    if retrival_model == "gpt2":
+    if retrival_model == "gpt-neo":
         input_ids = tokenizer.encode(prompt, return_tensors="pt").to(device)
         attention_mask = torch.ones(input_ids.shape, device=device)
+        max_length = input_ids.shape[1] + 10
         output = gpt_model.generate(
-            input_ids, max_length=1279, num_return_sequences=1, attention_mask=attention_mask)
+            input_ids, max_length=max_length, num_return_sequences=1, attention_mask=attention_mask)
         response = tokenizer.decode(output[0], skip_special_tokens=True)
+        print(f"Response -1 : {response}")
 
     elif retrival_model in ['ollama', 'openai']:
         response = generate_response_llm(prompt, model_name=retrival_model)
@@ -115,4 +118,4 @@ def generate_response(query: str, context: List[str], retrival_model: str = "gpt
 
     tok = time.time()
     logger.info(f"Time taken to generate response: {tok-tik}")
-    return response.split("Answer:")[0].strip()
+    return response.split("Answer:")[-1].strip()

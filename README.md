@@ -18,6 +18,13 @@
 
 - [ ] Streaming response setup
 
+------------
+1. To Use Openai model set the openai key
+2. To use ollama locally, install and run the ollama locally
+
+
+
+
 -----------------------
 - Unit Testing Response
 - gpt x - accuracy not good, respons time ~ 30s, token/s=24.27
