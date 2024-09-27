@@ -5,6 +5,7 @@ import torch
 from src.utils import log_execution_time, device
 import time
 import logging
+from config import embedding_dim, top_k
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -23,12 +24,12 @@ def store_chunks(chunks: List[str]):
     embeddings = model.encode(chunks)
     entities = [{"id": i, "vector": embeddings[i], "text": chunks[i],
                  "subject": "tag"} for i in range(len(embeddings))]
-    client.create_collection("document_chunks", dimension=384)
+    client.create_collection("document_chunks", dimension=embedding_dim)
     client.insert(collection_name="document_chunks", data=entities)
 
 
 @log_execution_time
-def semantic_search(query: str, top_k: int = 3) -> List[str]:
+def semantic_search(query: str, top_k: int = top_k) -> List[str]:
     tik = time.time()
     query_embedding = model.encode([query])
     tok = time.time()

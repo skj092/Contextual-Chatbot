@@ -5,10 +5,17 @@
 - [x] add logger and timer
 - [x] Setup evaluation pipeline
 - [x] Prepare question answer pairs for evaluation
-- Setup mlops pipeline, versioning
+- [ ] Setup mlops pipeline, versioning:
+    - [ ] Things to track (Store in DB)
+        - [ ] Chunk Size
+        - [ ] Embedding Model name
+        - [ ] Embedding dimension
+    - [ ] Things to track (Retrieve):
+        - [ ] LLM model name
+        - [ ] Latency
+        - [ ] Accuracy
+        - [ ] Cost
 
-
-["['sent']", ['sent']"]
 
 ## Using RAGAS ( https://arxiv.org/pdf/2309.15217)
 https://docs.ragas.io/en/latest/concepts/metrics/index.html#different-types-of-metrics
@@ -17,7 +24,6 @@ https://docs.ragas.io/en/latest/concepts/metrics/index.html#different-types-of-m
 ## Steps for new pdf
 1. Run `python evaluation/systhetic_data_generation.py` to generate the synthetic test question-answer pairs.
 2. Run the service and then `python evaluation/eval.py` to evaluate the service accuracy.
-
 
 Problem Statement - Contextual Chat Bot:
 
@@ -92,5 +98,4 @@ The project includes an end-to-end MLOps pipeline for model versioning, monitori
 
 # References:
 - https://milvus.io/docs/quickstart.md
-- https://claude.ai/chat/74f3d3be-3b5b-48a6-b62d-03bca7a6a2ff
 

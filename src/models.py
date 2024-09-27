@@ -4,11 +4,11 @@ import torch
 
 
 
-# Initialize SentenceTransformer model
+# Initialize SentenceTransformer model for embedding model
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
 
-# Initialize GPT-Neo
+# Initialize GPT-Neo (retriever)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 gpt_model = GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-125M").to(device)
 tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-125M")

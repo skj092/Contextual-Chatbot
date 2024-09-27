@@ -8,6 +8,7 @@ import logging
 from src.utils import (log_async_execution_time, parse_document)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+from config import chunk_size
 
 
 app = FastAPI()
@@ -27,7 +28,7 @@ async def read_index():
 @log_async_execution_time
 async def upload_document(file: UploadFile = File(...)):
     text = parse_document(file)
-    chunks = create_chunks(text)
+    chunks = create_chunks(text, chunk_size)
     store_chunks(chunks)
     return {"message": "Document uploaded and processed successfully"}
 
