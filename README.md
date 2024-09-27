@@ -16,6 +16,13 @@
         - [ ] Accuracy
         - [ ] Cost
 
+- [ ] Streaming response setup
+
+-----------------------
+- Unit Testing Response
+- gpt x - accuracy not good, respons time ~ 30s, token/s=24.27
+- ollama(llama 2.1) - accuracy good, response time - 30s, token/s = 1.9
+- gpt4o-mini- accuracy good, response time 4.6s, token/s = 10.6
 
 ## Using RAGAS ( https://arxiv.org/pdf/2309.15217)
 https://docs.ragas.io/en/latest/concepts/metrics/index.html#different-types-of-metrics

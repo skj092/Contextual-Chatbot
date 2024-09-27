@@ -13,4 +13,5 @@ dependencies = [
     "datasets>=3.0.1",
     "ragas>=0.1.20",
     "dvc>=3.55.2",
+    "langchain-ollama>=0.1.3",
 ]

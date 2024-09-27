@@ -6,9 +6,10 @@ import time
 from src.vectordb import create_chunks, store_chunks, semantic_search, generate_response
 import logging
 from src.utils import (log_async_execution_time, parse_document)
+from config import chunk_size, retrival_model
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-from config import chunk_size
 
 
 app = FastAPI()
@@ -41,7 +42,7 @@ async def query_document(query: Query):
     relevant_chunks = semantic_search(query.text)
     if not relevant_chunks:
         return {"response": "I don't know the answer to that question."}
-    response = generate_response(query.text, relevant_chunks)
+    response = generate_response(query.text, relevant_chunks, retrival_model=retrival_model)
     tok = time.time()
     print(f"Total tokens {len(response.split())}, Time taken: {tok-tik}")
     print(f"Token per second: {len(response.split())/(tok-tik)}")

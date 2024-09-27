@@ -5,7 +5,9 @@ chunk_size = 1000
 model_name = "all-MiniLM-L6-v2"
 embedding_dim = 384
 top_k = 3
-retriever_model = "EleutherAI/gpt-neo-125M"
+retrival_model = "gpt2"
+retrival_model = "ollama"
+retrival_model = "openai"
 
 # Create a list of variable names to include
 var_names = [name for name in globals() if not name.startswith('__')

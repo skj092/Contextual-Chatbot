@@ -1,11 +1,16 @@
 from pymilvus import connections, Collection, FieldSchema, CollectionSchema, DataType, MilvusClient
 from typing import List
-from src.models import model, tokenizer, gpt_model
+from src.models import model, tokenizer, gpt_model, prompt
 import torch
 from src.utils import log_execution_time, device
 import time
 import logging
 from config import embedding_dim, top_k
+from langchain import hub
+from langchain_openai import ChatOpenAI
+from langchain_ollama import ChatOllama
+
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -44,7 +49,7 @@ def semantic_search(query: str, top_k: int = top_k) -> List[str]:
 
 
 @log_execution_time
-def generate_response(query: str, context: List[str]) -> str:
+def generate_response(query: str, context: List[str], retrival_model: str = "gpt2"):
     prompt = f"Context: {' '.join(context)}\n\nQuestion: {query}\n\nAnswer:"
     tik = time.time()
     input_ids = tokenizer.encode(prompt, return_tensors="pt").to(device)
@@ -53,13 +58,23 @@ def generate_response(query: str, context: List[str]) -> str:
     attention_mask = torch.ones(input_ids.shape, device=device)
 
     tik = time.time()
-    output = gpt_model.generate(
-        input_ids, max_length=1279, num_return_sequences=1, attention_mask=attention_mask)
+    if retrival_model == "gpt2":
+        output = gpt_model.generate(
+            input_ids, max_length=1279, num_return_sequences=1, attention_mask=attention_mask)
+        response = tokenizer.decode(output[0], skip_special_tokens=True)
+
+    if retrival_model == "ollama":
+        prompt = hub.pull("rlm/rag-prompt")
+        prompt = prompt.format(context=" ".join(context), question=query)
+        llm = ChatOllama(model="llama3.2", temperature=0)
+        response = llm.invoke(prompt).content
+
+    if retrival_model == 'openai':
+        prompt = hub.pull("rlm/rag-prompt")
+        prompt = prompt.format(context=" ".join(context), question=query)
+        llm = ChatOpenAI(model="gpt-4o-mini")
+        response = llm.invoke(prompt).content
+
     tok = time.time()
     logger.info(f"Time taken to generate response: {tok-tik}")
-
-    tik = time.time()
-    response = tokenizer.decode(output[0], skip_special_tokens=True)
-    tok = time.time()
-    logger.info(f"Time taken to decode response: {tok-tik}")
     return response.split("Answer:")[-1].strip()
