@@ -49,32 +49,70 @@ def semantic_search(query: str, top_k: int = top_k) -> List[str]:
 
 
 @log_execution_time
-def generate_response(query: str, context: List[str], retrival_model: str = "gpt2"):
-    prompt = f"Context: {' '.join(context)}\n\nQuestion: {query}\n\nAnswer:"
+def generate_response_gpt2(input_ids, attention_mask):
+    """
+    Generates a response using the GPT-2 model.
+    """
     tik = time.time()
-    input_ids = tokenizer.encode(prompt, return_tensors="pt").to(device)
+    output = gpt_model.generate(
+        input_ids, max_length=1279, num_return_sequences=1, attention_mask=attention_mask)
+    response = tokenizer.decode(output[0], skip_special_tokens=True)
     tok = time.time()
-    logger.info(f"Time taken to encode prompt: {tok-tik}")
-    attention_mask = torch.ones(input_ids.shape, device=device)
+    logger.info(f"Time taken to generate response with GPT-2: {tok - tik}")
+    return response
 
+
+@log_execution_time
+def generate_response_llm(prompt: str, model_name: str):
+    """
+    Generates a response using the specified LLM (Ollama or OpenAI).
+    """
     tik = time.time()
+    if model_name == "ollama":
+        llm = ChatOllama(model="llama3.2", temperature=0)
+    elif model_name == "openai":
+        llm = ChatOpenAI(model="gpt-4o-mini")
+    else:
+        raise ValueError(f"Unknown model name: {model_name}")
+
+    response = llm.invoke(prompt).content
+    tok = time.time()
+    logger.info(
+        f"Time taken to generate response with {model_name}: {tok - tik}")
+    return response
+
+
+@log_execution_time
+def format_prompt(context: List[str], query: str, model_name: str):
+    """
+    Formats the prompt based on the model name.
+    """
+    if model_name == "gpt2":
+        return f"Context: {' '.join(context)}\n\nQuestion: {query}\n\nAnswer:"
+    elif model_name == "ollama":
+        return prompt.format(context=" ".join(context), question=query)
+    elif model_name == "openai":
+        return prompt.format(context=" ".join(context), question=query)
+    else:
+        raise ValueError(f"Unknown model name: {model_name}")
+
+
+@log_execution_time
+def generate_response(query: str, context: List[str], retrival_model: str = "gpt2"):
+    tik = time.time()
+    prompt = format_prompt(context, query, retrival_model)
     if retrival_model == "gpt2":
+        input_ids = tokenizer.encode(prompt, return_tensors="pt").to(device)
+        attention_mask = torch.ones(input_ids.shape, device=device)
         output = gpt_model.generate(
             input_ids, max_length=1279, num_return_sequences=1, attention_mask=attention_mask)
         response = tokenizer.decode(output[0], skip_special_tokens=True)
 
-    if retrival_model == "ollama":
-        prompt = hub.pull("rlm/rag-prompt")
-        prompt = prompt.format(context=" ".join(context), question=query)
-        llm = ChatOllama(model="llama3.2", temperature=0)
-        response = llm.invoke(prompt).content
-
-    if retrival_model == 'openai':
-        prompt = hub.pull("rlm/rag-prompt")
-        prompt = prompt.format(context=" ".join(context), question=query)
-        llm = ChatOpenAI(model="gpt-4o-mini")
-        response = llm.invoke(prompt).content
+    elif retrival_model in ['ollama', 'openai']:
+        response = generate_response_llm(prompt, model_name=retrival_model)
+    else:
+        raise ValueError(f"Unknown model name: {retrival_model}")
 
     tok = time.time()
     logger.info(f"Time taken to generate response: {tok-tik}")
-    return response.split("Answer:")[-1].strip()
+    return response.split("Answer:")[0].strip()
