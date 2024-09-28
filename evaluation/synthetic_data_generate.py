@@ -6,10 +6,11 @@ import time
 from ragas.run_config import RunConfig
 from dotenv import load_dotenv
 import asyncio
+import os
 
 load_dotenv()
 
-pdf_directory = "/home/sonujha/rnd/qp-ai-assessment/data/"
+pdf_directory = "/home/sonujha/rnd/qp-ai-assessment/data/pdfs/"
 print("Loading documents from directory: ", pdf_directory)
 tik = time.time()
 loader = DirectoryLoader(pdf_directory, use_multithreading=True, sample_size=1)
@@ -50,7 +51,8 @@ tik = time.time()
 try:
     testset = loop.run_until_complete(generate_testset())
     df = testset.to_pandas()
-    df.to_csv("testset.csv", index=False)
+    file_name = "tmp/testset.csv"
+    df.to_csv(file_name, index=False)
 finally:
     # Close the loop
     loop.close()

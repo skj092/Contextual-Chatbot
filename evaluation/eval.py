@@ -7,7 +7,7 @@ import requests
 from tqdm import tqdm
 import ast
 
-test_data = "/home/sonujha/rnd/qp-ai-assessment/testset.csv"
+test_data = "/home/sonujha/rnd/qp-ai-assessment/data/testset.csv"
 
 # os.environ["OPENAI_API_KEY"] = "your-openai-key"
 
@@ -43,7 +43,7 @@ def get_answer_of_question(test_data):
         answer = get_answer(question)
         answer_list.append(answer['response'])
     df['answer'] = answer_list
-    df.to_csv("question_answer.csv")
+    df.to_csv("data/question_answer.csv")
     return df
 
 
@@ -63,5 +63,5 @@ dataset = Dataset.from_dict(data_samples)
 
 score = evaluate(dataset, metrics=[faithfulness, answer_correctness])
 score = score.to_pandas()
-score.to_csv('score.csv')
+score.to_csv('data/score.csv')
 print("average answer_correctness: ", score['answer_correctness'].mean())
