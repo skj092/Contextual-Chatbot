@@ -2,6 +2,8 @@ data.db
 *.pyc
 *.lock
 *.db
-*.csv
 .env
 data
+/question_answer.csv
+/score.csv
+/testset.csv
