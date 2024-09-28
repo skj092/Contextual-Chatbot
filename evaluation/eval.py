@@ -37,7 +37,6 @@ def get_answer(question):
 
 def get_answer_of_question(test_data):
     df = pd.read_csv(test_data)
-    df = df.sample(n=2)
     question_list = df['question'].tolist()
     answer_list = []
     for question in tqdm(question_list):

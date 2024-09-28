@@ -113,3 +113,19 @@ The project includes an end-to-end MLOps pipeline for model versioning, monitori
 # References:
 - https://milvus.io/docs/quickstart.md
 
+
+# Files to Track using dvc
+1. testset.csv -> evaluation/systhetic_data_generation.py -> Generate the question answer pairs (GT)
+2. question_answer.csv -> Intermediary file
+3. score.csv -> evaluation/eval.py -> predict and answer and evaluate the model by comparing with GT.
+4. config.json -> config.py -> Store the configuration
+
+
+
+# ML Ops Cycle
+
+New pdf -> Generate QA pairs -> Evaluate -> Update the config -> Evaluate
+1. Generate QA pairs (evaluation/systhetic_data_generation.py)
+2. Evaluate (evaluation/eval.py)
+3. Check the score (score.csv) and update the config (config.py)
+4. Repeat 2 and 3
