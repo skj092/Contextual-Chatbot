@@ -16,4 +16,5 @@ dependencies = [
     "pypdf2>=3.0.1",
     "langchain-openai>=0.2.1",
     "python-multipart>=0.0.11",
+    "unstructured[pdf]>=0.15.13",
 ]
