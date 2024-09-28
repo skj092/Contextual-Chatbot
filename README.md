@@ -5,10 +5,31 @@
 - [x] add logger and timer
 - [x] Setup evaluation pipeline
 - [x] Prepare question answer pairs for evaluation
-- Setup mlops pipeline, versioning
+- [ ] Setup mlops pipeline, versioning:
+    - [ ] Things to track (Store in DB)
+        - [ ] Chunk Size
+        - [ ] Embedding Model name
+        - [ ] Embedding dimension
+    - [ ] Things to track (Retrieve):
+        - [ ] LLM model name
+        - [ ] Latency
+        - [ ] Accuracy
+        - [ ] Cost
+
+- [ ] Streaming response setup
+
+------------
+1. To Use Openai model set the openai key
+2. To use ollama locally, install and run the ollama locally
 
 
-["['sent']", ['sent']"]
+
+
+-----------------------
+- Unit Testing Response
+- gpt x - accuracy not good, respons time ~ 30s, token/s=24.27
+- ollama(llama 2.1) - accuracy good, response time - 30s, token/s = 1.9
+- gpt4o-mini- accuracy good, response time 4.6s, token/s = 10.6
 
 ## Using RAGAS ( https://arxiv.org/pdf/2309.15217)
 https://docs.ragas.io/en/latest/concepts/metrics/index.html#different-types-of-metrics
@@ -17,7 +38,6 @@ https://docs.ragas.io/en/latest/concepts/metrics/index.html#different-types-of-m
 ## Steps for new pdf
 1. Run `python evaluation/systhetic_data_generation.py` to generate the synthetic test question-answer pairs.
 2. Run the service and then `python evaluation/eval.py` to evaluate the service accuracy.
-
 
 Problem Statement - Contextual Chat Bot:
 
@@ -92,5 +112,20 @@ The project includes an end-to-end MLOps pipeline for model versioning, monitori
 
 # References:
 - https://milvus.io/docs/quickstart.md
-- https://claude.ai/chat/74f3d3be-3b5b-48a6-b62d-03bca7a6a2ff
 
+
+# Files to Track using dvc
+1. testset.csv -> evaluation/systhetic_data_generation.py -> Generate the question answer pairs (GT)
+2. question_answer.csv -> Intermediary file
+3. score.csv -> evaluation/eval.py -> predict and answer and evaluate the model by comparing with GT.
+4. config.json -> config.py -> Store the configuration
+
+
+
+# ML Ops Cycle
+
+New pdf -> Generate QA pairs -> Evaluate -> Update the config -> Evaluate
+1. Generate QA pairs (evaluation/systhetic_data_generation.py)
+2. Evaluate (evaluation/eval.py)
+3. Check the score (score.csv) and update the config (config.py)
+4. Repeat 2 and 3
