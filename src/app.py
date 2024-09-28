@@ -48,5 +48,5 @@ async def query_document(query: Query):
     print(f"Token per second: {len(response.split())/(tok-tik)}")
     return {"response": response}
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+#if __name__ == "__main__":
+#    uvicorn.run(app, host="0.0.0.0", port=8000)
