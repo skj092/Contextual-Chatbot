@@ -48,10 +48,7 @@ def get_answer_of_question(test_data):
 
 
 if os.path.exists(test_data):
-    if os.path.exists('question_answer.csv'):
-        df = pd.read_csv('question_answer.csv')
-    else:
-        df = get_answer_of_question(test_data)
+    df = get_answer_of_question(test_data)
 
     contexts = df['contexts'].tolist()
     contexts = [ast.literal_eval(item) if isinstance(
@@ -67,3 +64,4 @@ dataset = Dataset.from_dict(data_samples)
 score = evaluate(dataset, metrics=[faithfulness, answer_correctness])
 score = score.to_pandas()
 score.to_csv('score.csv')
+print("average answer_correctness: ", score['answer_correctness'].mean())
