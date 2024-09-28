@@ -1,14 +1,21 @@
-from pymilvus import connections, Collection, FieldSchema, CollectionSchema, DataType, MilvusClient
+from pymilvus import MilvusClient
 from typing import List
 from src.models import model, tokenizer, gpt_model, prompt
 import torch
 from src.utils import log_execution_time, device
 import time
 import logging
-from config import embedding_dim, top_k
 from langchain import hub
 from langchain_openai import ChatOpenAI
+import json
 from langchain_ollama import ChatOllama
+
+with open('config.json', 'r') as f:
+    config = json.load(f)
+chunk_size = config['chunk_size']
+retrival_model = config['retrival_model']
+embedding_dim = config['embedding_dim']
+top_k = config['top_k']
 
 
 logging.basicConfig(level=logging.INFO)
@@ -39,7 +46,6 @@ def semantic_search(query: str, top_k: int = top_k) -> List[str]:
     query_embedding = model.encode([query])
     tok = time.time()
     logger.info(f"Time taken to encode query: {tok-tik}")
-    search_params = {"metric_type": "L2", "params": {"nprobe": 10}}
     tik = time.time()
     results = client.search(collection_name="document_chunks",
                             data=query_embedding, limit=top_k, output_fields=["text"])

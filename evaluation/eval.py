@@ -6,8 +6,10 @@ import os
 import requests
 from tqdm import tqdm
 import ast
+import json
 
 test_data = "/home/sonujha/rnd/qp-ai-assessment/data/testset.csv"
+log_file_path = "data/experiment_log.csv"
 
 # os.environ["OPENAI_API_KEY"] = "your-openai-key"
 
@@ -64,4 +66,19 @@ dataset = Dataset.from_dict(data_samples)
 score = evaluate(dataset, metrics=[faithfulness, answer_correctness])
 score = score.to_pandas()
 score.to_csv('data/score.csv')
+
+
+def update_log_file(log_file):
+    with open('config.json') as f:
+        config = json.load(f)
+    df = pd.DataFrame([config])
+    if os.path.exists(log_file_path):
+        log_file = pd.read_csv(log_file_path)
+        df = pd.concat([log_file, df])
+        print(f"log file {log_file} updated")
+    df['answer_correctness'] = score['answer_correctness'].mean()
+    df.to_csv('data/experiment_log.csv')
+
+
 print("average answer_correctness: ", score['answer_correctness'].mean())
+update_log_file(log_file_path)

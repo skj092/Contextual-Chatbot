@@ -1,15 +1,20 @@
 from fastapi import FastAPI, File, UploadFile
 from pydantic import BaseModel
-import uvicorn
 from fastapi.responses import FileResponse
 import time
 from src.vectordb import create_chunks, store_chunks, semantic_search, generate_response
 import logging
 from src.utils import (log_async_execution_time, parse_document)
-from config import chunk_size, retrival_model
+import json
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+with open('config.json', 'r') as f:
+    config = json.load(f)
+chunk_size = config['chunk_size']
+retrival_model = config['retrival_model']
+
 
 
 app = FastAPI()
@@ -48,5 +53,3 @@ async def query_document(query: Query):
     print(f"Token per second: {len(response.split())/(tok-tik)}")
     return {"response": response}
 
-#if __name__ == "__main__":
-#    uvicorn.run(app, host="0.0.0.0", port=8000)

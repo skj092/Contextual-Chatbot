@@ -1,0 +1,4 @@
+,Unnamed: 0.1,Unnamed: 0,chunk_size,model_name,embedding_dim,top_k,retrival_model,answer_correctness
+0,0.0,0.0,1000,all-MiniLM-L6-v2,384,3,openai,0.29518910510556806
+1,0.0,,1000,all-MiniLM-L6-v2,384,3,openai,0.29518910510556806
+0,,,1000,all-MiniLM-L6-v2,384,3,openai,0.29518910510556806

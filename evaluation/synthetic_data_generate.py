@@ -6,7 +6,6 @@ import time
 from ragas.run_config import RunConfig
 from dotenv import load_dotenv
 import asyncio
-import os
 import argparse
 
 parser = argparse.ArgumentParser(description='Generate synthetic data')

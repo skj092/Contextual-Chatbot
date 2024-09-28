@@ -120,3 +120,19 @@ sh startup.sh
 
 python evaluation/synthetic_data_generate.py --pdf_directory="data/pdfs" --num_questions=12
 
+
+```
+{
+    "chunk_size": 1000,
+    "model_name": "all-MiniLM-L6-v2",
+    "embedding_dim": 384,
+    "top_k": 3,
+    "retrival_model": "openai"
+}
+```
+# Global variables
+#retrival_model = "gpt-neo"
+#retrival_model = "ollama"
+#retrival_model = "openai"
+
+
