@@ -32,7 +32,6 @@ RUN echo "Directory structure inside the container:" && ls -l /app
 
 # Expose the port for the app to be accessible
 EXPOSE 52207
-
 # Run the application using Gunicorn with Uvicorn worker
 CMD ["python", "-m", "gunicorn", "--bind=0.0.0.0:52207", "src.app:app", "-k", "uvicorn.workers.UvicornWorker", "--timeout", "180", "--workers", "1"]
 

@@ -30,7 +30,7 @@ data_samples = {
 
 # Get the answer from the api
 def get_answer(question):
-    url = "http://127.0.0.1:8000/query"
+    url = "http://0.0.0.0:52207/query"
     answer = requests.post(url, json={"text": question}).json()
     return answer
 

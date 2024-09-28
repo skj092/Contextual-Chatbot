@@ -1,5 +1,8 @@
 import json
 
+# systhetic data generation for evaluation
+n_samples = 10
+
 # Global variables
 chunk_size = 1000
 model_name = "all-MiniLM-L6-v2"

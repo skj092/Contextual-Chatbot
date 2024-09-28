@@ -7,11 +7,22 @@ from ragas.run_config import RunConfig
 from dotenv import load_dotenv
 import asyncio
 import os
+import argparse
+
+parser = argparse.ArgumentParser(description='Generate synthetic data')
+parser.add_argument('--pdf_directory', type=str,
+                    help='Path to the directory containing pdfs')
+parser.add_argument('--num_questions', type=int,
+                    help='Number of questions to generate')
+args = parser.parse_args()
+total_questions = args.num_questions if args.num_questions else 10
 
 load_dotenv()
 
-pdf_directory = "/home/sonujha/rnd/qp-ai-assessment/data/pdfs/"
-print("Loading documents from directory: ", pdf_directory)
+default_directory = "/home/sonujha/rnd/qp-ai-assessment/data/pdfs/"
+pdf_directory = args.pdf_directory if args.pdf_directory else default_directory
+print(
+    f"Generating {total_questions} questions from all the documents in the directory {pdf_directory}")
 tik = time.time()
 loader = DirectoryLoader(pdf_directory, use_multithreading=True, sample_size=1)
 documents = loader.load()
@@ -30,8 +41,8 @@ critic_llm = ChatOpenAI(model="gpt-4o")
 embeddings = OpenAIEmbeddings()
 
 # test the llm
-#print(generator_llm("What is the capital of India?"))
-#print(critic_llm("What is the capital of India?"))
+# print(generator_llm("What is the capital of India?"))
+# print(critic_llm("What is the capital of India?"))
 
 generator = TestsetGenerator.from_langchain(
     generator_llm,
@@ -41,7 +52,7 @@ generator = TestsetGenerator.from_langchain(
 
 
 async def generate_testset():
-    return generator.generate_with_langchain_docs(documents, test_size=10, distributions=distributions, run_config=RunConfig())
+    return generator.generate_with_langchain_docs(documents, test_size=total_questions, distributions=distributions, run_config=RunConfig())
 
 distributions = {simple: 0.5, reasoning: 0.25, multi_context: 0.25}
 loop = asyncio.new_event_loop()
@@ -51,7 +62,7 @@ tik = time.time()
 try:
     testset = loop.run_until_complete(generate_testset())
     df = testset.to_pandas()
-    file_name = "tmp/testset.csv"
+    file_name = "data/testset.csv"
     df.to_csv(file_name, index=False)
 finally:
     # Close the loop
