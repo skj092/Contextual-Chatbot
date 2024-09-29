@@ -1,3 +1,57 @@
+# setup with docker
+```bash
+docker-compose up
+```
+
+# Setup without docker
+
+1. Create a virtual environment
+
+```bash
+python -m venv .venv
+```
+
+2. activate the virtual environment
+
+```bash
+source .venv/bin/activate
+```
+
+3. Install the dependencies
+
+```bash
+pip install -r requirement.txt
+```
+
+4. Run the application
+
+```bash
+sh startup.sh
+```
+
+# Generate the test data
+
+1. keep all the pdf in the /data/pdf folder
+2. python evaluation/systhetic_data_generation.py
+3. python evaluation/eval.py
+
+python evaluation/synthetic_data_generate.py --pdf_directory="data/pdfs" --num_questions=12
+
+
+```
+{
+    "chunk_size": 1000,
+    "model_name": "all-MiniLM-L6-v2",
+    "embedding_dim": 384,
+    "top_k": 3,
+    "retrival_model": "openai"
+}
+```
+currently 3 retrival_models are available - 1. "gpt-neo", "ollama" and "openai"
+To Use ollama need to setup ollama locally
+To Use openai need to setup api key in the environment
+
+
 # TODO
 - [x] Flow: pdf -> Extract Text -> Chunking -> Embedding -> Save to DB -> query -> Embedding -> Search in DB -> Retrieve Chunks -> Generate Response
 - [x] Build a boilerplate application
@@ -6,31 +60,26 @@
 - [x] Setup evaluation pipeline
 - [x] Prepare question answer pairs for evaluation
 - [ ] Setup mlops pipeline, versioning:
-    - [ ] Things to track (Store in DB)
-        - [ ] Chunk Size
-        - [ ] Embedding Model name
-        - [ ] Embedding dimension
+    - [x] Things to track (Store in DB)
+        - [x] Chunk Size
+        - [x] Embedding Model name
+        - [x] Embedding dimension
     - [ ] Things to track (Retrieve):
-        - [ ] LLM model name
+        - [x] LLM model name
         - [ ] Latency
         - [ ] Accuracy
         - [ ] Cost
-
 - [ ] Streaming response setup
 
 ------------
-1. To Use Openai model set the openai key
+1. To Use Openai model set the openai key as an environment variable
 2. To use ollama locally, install and run the ollama locally
-
-
-
 
 -----------------------
 - Unit Testing Response
 - gpt x - accuracy not good, respons time ~ 30s, token/s=24.27
 - ollama(llama 2.1) - accuracy good, response time - 30s, token/s = 1.9
 - gpt4o-mini- accuracy good, response time 4.6s, token/s = 10.6
-
 
 
 ## Steps for new pdf
@@ -79,60 +128,5 @@ New pdf -> Generate QA pairs -> Evaluate -> Update the config -> Evaluate
 # References:
 - Vector DB: https://milvus.io/docs/quickstart.md
 - RAGAS : https://arxiv.org/pdf/2309.15217)
-
-
-# setup with docker
-```bash
-docker-compose up
-```
-
-# Setup without docker
-
-1. Create a virtual environment
-
-```bash
-venv --python 3.11
-```
-
-2. activate the virtual environment
-
-```bash
-source .venv/bin/activate
-```
-
-3. Install the dependencies
-
-```bash
-pip install -r requirement.txt
-```
-
-4. Run the application
-
-```bash
-sh startup.sh
-```
-
-# Generate the test data
-
-1. keep all the pdf in the /data/pdf folder
-2. python evaluation/systhetic_data_generation.py
-3. python evaluation/eval.py
-
-python evaluation/synthetic_data_generate.py --pdf_directory="data/pdfs" --num_questions=12
-
-
-```
-{
-    "chunk_size": 1000,
-    "model_name": "all-MiniLM-L6-v2",
-    "embedding_dim": 384,
-    "top_k": 3,
-    "retrival_model": "openai"
-}
-```
-# Global variables
-#retrival_model = "gpt-neo"
-#retrival_model = "ollama"
-#retrival_model = "openai"
 
 
