@@ -1,92 +1,3 @@
-# setup with docker
-```bash
-docker-compose up
-```
-
-# Setup without docker
-
-1. Create a virtual environment
-
-```bash
-python -m venv .venv
-```
-
-2. activate the virtual environment
-
-```bash
-source .venv/bin/activate
-```
-
-3. Install the dependencies
-
-```bash
-pip install -r requirement.txt
-```
-
-4. Run the application
-
-```bash
-sh startup.sh
-```
-
-# Generate the test data
-
-1. keep all the pdf in the /data/pdf folder
-2. python evaluation/systhetic_data_generation.py
-3. python evaluation/eval.py
-
-python evaluation/synthetic_data_generate.py --pdf_directory="data/pdfs" --num_questions=12
-
-
-```
-{
-    "chunk_size": 1000,
-    "model_name": "all-MiniLM-L6-v2",
-    "embedding_dim": 384,
-    "top_k": 3,
-    "retrival_model": "openai"
-}
-```
-currently 3 retrival_models are available - 1. "gpt-neo", "ollama" and "openai"
-To Use ollama need to setup ollama locally
-To Use openai need to setup api key in the environment
-
-
-# TODO
-- [x] Flow: pdf -> Extract Text -> Chunking -> Embedding -> Save to DB -> query -> Embedding -> Search in DB -> Retrieve Chunks -> Generate Response
-- [x] Build a boilerplate application
-- [x] Refactor the code to seperate db and model
-- [x] add logger and timer
-- [x] Setup evaluation pipeline
-- [x] Prepare question answer pairs for evaluation
-- [ ] Setup mlops pipeline, versioning:
-    - [x] Things to track (Store in DB)
-        - [x] Chunk Size
-        - [x] Embedding Model name
-        - [x] Embedding dimension
-    - [ ] Things to track (Retrieve):
-        - [x] LLM model name
-        - [ ] Latency
-        - [ ] Accuracy
-        - [ ] Cost
-- [ ] Streaming response setup
-
-------------
-1. To Use Openai model set the openai key as an environment variable
-2. To use ollama locally, install and run the ollama locally
-
------------------------
-- Unit Testing Response
-- gpt x - accuracy not good, respons time ~ 30s, token/s=24.27
-- ollama(llama 2.1) - accuracy good, response time - 30s, token/s = 1.9
-- gpt4o-mini- accuracy good, response time 4.6s, token/s = 10.6
-
-
-## Steps for new pdf
-1. Run `python evaluation/systhetic_data_generation.py` to generate the synthetic test question-answer pairs.
-2. Run the service and then `python evaluation/eval.py` to evaluate the service accuracy.
-
-
 # Contextual Chatbot
 
 This project implements a contextual chatbot that can answer questions based on uploaded documents. It uses FastAPI for the backend, Milvus for vector storage, and GPT-Neo for text generation.
@@ -106,11 +17,74 @@ This project implements a contextual chatbot that can answer questions based on 
 3. View chat history:
    - The chat history will be displayed in the section below the query form.
 
-## API Endpoints
 
+# Setup with docker
+```bash
+docker-compose up
+```
+
+# Setup without docker
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirement.txt
+sh startup.sh
+```
+
+# High Level Design
+![](./static/hld.png)
+
+
+# Design with components
+![](./static/hld-c.png)
+
+## Flow: 
+- PDF -> Extract Text -> Chunking -> Embedding -> Save to DB
+- query -> Embedding -> Search in DB -> Retrieve Releveent Chunks -> LLM -> Response
+
+## Component Overview
+1. FastAPI - Used for backend with two endpoints
 - `POST /upload`: Upload and process a document (PDF or DOCX)
+- `POST /query`: To get response from the llm with query.
 
-# ML Ops Cycle
+2. Front-End
+- keep a very simple index.html file which can use used for upload the document, and submit query. The conversational history will also be visible.
+
+3. Performance Evaluation
+- Used [ragas](https://arxiv.org/pdf/2309.15217) for synthetic data generation and performance evaluation
+
+4. Vector DB
+- Used [Milvus](https://milvus.io/docs/quickstart.md) as a vector db
+
+5. Document Processing
+- Used Langchain to parsing and processing the documents.
+
+6. LLM
+- I have used openai to generate synthetic data (ragas backend), considering it is a one time things. 
+- As a RAG retriever you can use either hugging face model, ollama models and openai models currently. However the module can be easily modified to support any models. 
+- I have tested 3 models : 1. ollama llama 3.2 2. openai models 3. HF GPT Neo
+- Ollama latency is poor but if we deploy ollama on the server it will be faster. Accuracy wise it is good.
+- OpenAI model is accurate with good latency. 
+- To Use ollama need to setup ollama locally
+- To Use openai need to setup api key in the environment
+
+
+## Generate the test data
+
+1. keep all the pdf in the /data/pdf folder
+2. python evaluation/systhetic_data_generation.py
+3. python evaluation/eval.py
+
+```bash
+python evaluation/synthetic_data_generate.py --pdf_directory="data/pdfs" --num_questions=12
+```
+
+## Steps for new pdf
+1. Run `python evaluation/systhetic_data_generation.py` to generate the synthetic test question-answer pairs.
+2. Run the service and then `python evaluation/eval.py` to evaluate the service accuracy.
+
+
+## ML Ops Cycle
 
 New pdf -> Generate QA pairs -> Evaluate -> Update the config -> Evaluate
 1. Generate QA pairs (evaluation/systhetic_data_generation.py)
@@ -125,8 +99,42 @@ New pdf -> Generate QA pairs -> Evaluate -> Update the config -> Evaluate
 4. config.json -> config.py -> Store the configuration
 
 
-# References:
-- Vector DB: https://milvus.io/docs/quickstart.md
-- RAGAS : https://arxiv.org/pdf/2309.15217)
+```json
+{
+    "chunk_size": 1000, # embedding size of the chunk
+    "model_name": "all-MiniLM-L6-v2", # emdedding models
+    "embedding_dim": 384,
+    "top_k": 3, # num of relevent chunk as a context for retriver
+    "retrival_model": "openai" # openai/ollama/gpt-neo
+}
+```
+------------------------------------------------
+
+# TODO
+- [x] Flow: pdf -> Extract Text -> Chunking -> Embedding -> Save to DB -> query -> Embedding -> Search in DB -> Retrieve Chunks -> Generate Response
+- [x] Build a boilerplate application
+- [x] Refactor the code to seperate db and model
+- [x] add logger and timer
+- [x] Setup evaluation pipeline
+- [x] Prepare question answer pairs for evaluation
+- [ ] Setup mlops pipeline, versioning:
+    - [x] Things to track (Store in DB)
+        - [x] Chunk Size
+        - [x] Embedding Model name
+        - [x] Embedding dimension
+    - [ ] Things to track (Retrieve):
+        - [x] LLM model name
+        - [x] Latency
+        - [ ] Accuracy
+        - [ ] Cost
+- [ ] Streaming response setup
+-----------------------
+- Unit Testing Response
+- gpt x - accuracy not good, respons time ~ 30s, token/s=24.27
+- ollama(llama 2.1) - accuracy good, response time - 30s, token/s = 1.9
+- gpt4o-mini- accuracy good, response time 4.6s, token/s = 10.6
+
+
+
 
 
