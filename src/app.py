@@ -4,17 +4,16 @@ from fastapi.responses import FileResponse
 import time
 from src.vectordb import create_chunks, store_chunks, semantic_search, generate_response
 import logging
-from src.utils import (log_async_execution_time, parse_document)
+from src.utils import log_async_execution_time, parse_document
 import json
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-with open('config.json', 'r') as f:
+with open("config.json", "r") as f:
     config = json.load(f)
-chunk_size = config['chunk_size']
-retrival_model = config['retrival_model']
-
+chunk_size = config["chunk_size"]
+retrival_model = config["retrival_model"]
 
 
 app = FastAPI()
@@ -47,9 +46,10 @@ async def query_document(query: Query):
     relevant_chunks = semantic_search(query.text)
     if not relevant_chunks:
         return {"response": "I don't know the answer to that question."}
-    response = generate_response(query.text, relevant_chunks, retrival_model=retrival_model)
+    response = generate_response(
+        query.text, relevant_chunks, retrival_model=retrival_model
+    )
     tok = time.time()
     print(f"Total tokens {len(response.split())}, Time taken: {tok-tik}")
     print(f"Token per second: {len(response.split())/(tok-tik)}")
     return {"response": response}
-

@@ -6,6 +6,7 @@ from io import BytesIO
 import torch
 import logging
 import PyPDF2
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -21,8 +22,10 @@ def log_execution_time(func):
         end_time = time.time()
         execution_time = end_time - start_time
         logger.info(
-            f"Function '{func.__name__}' executed in {execution_time:.4f} seconds")
+            f"Function '{func.__name__}' executed in {execution_time:.4f} seconds"
+        )
         return result
+
     return wrapper
 
 
@@ -34,18 +37,20 @@ def log_async_execution_time(func):
         end_time = time.time()
         execution_time = end_time - start_time
         logger.info(
-            f"Function '{func.__name__}' executed in {execution_time:.4f} seconds")
+            f"Function '{func.__name__}' executed in {execution_time:.4f} seconds"
+        )
         return result
+
     return wrapper
 
 
 @log_execution_time
 def parse_document(file: UploadFile) -> str:
     content = file.file.read()
-    if file.filename.endswith('.pdf'):
+    if file.filename.endswith(".pdf"):
         pdf_reader = PyPDF2.PdfReader(BytesIO(content))
         text = "".join([page.extract_text() for page in pdf_reader.pages])
-    elif file.filename.endswith('.docx'):
+    elif file.filename.endswith(".docx"):
         doc = docx.Document(BytesIO(content))
         text = "\n".join([paragraph.text for paragraph in doc.paragraphs])
     else:

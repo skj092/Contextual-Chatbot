@@ -8,11 +8,11 @@ from dotenv import load_dotenv
 import asyncio
 import argparse
 
-parser = argparse.ArgumentParser(description='Generate synthetic data')
-parser.add_argument('--pdf_directory', type=str,
-                    help='Path to the directory containing pdfs')
-parser.add_argument('--num_questions', type=int,
-                    help='Number of questions to generate')
+parser = argparse.ArgumentParser(description="Generate synthetic data")
+parser.add_argument(
+    "--pdf_directory", type=str, help="Path to the directory containing pdfs"
+)
+parser.add_argument("--num_questions", type=int, help="Number of questions to generate")
 args = parser.parse_args()
 total_questions = args.num_questions if args.num_questions else 10
 
@@ -21,17 +21,18 @@ load_dotenv()
 default_directory = "/home/sonujha/rnd/qp-ai-assessment/data/pdfs/"
 pdf_directory = args.pdf_directory if args.pdf_directory else default_directory
 print(
-    f"Generating {total_questions} questions from all the documents in the directory {pdf_directory}")
+    f"Generating {total_questions} questions from all the documents in the directory {pdf_directory}"
+)
 tik = time.time()
 loader = DirectoryLoader(pdf_directory, use_multithreading=True, sample_size=1)
 documents = loader.load()
 tok = time.time()
 print("Loaded {} documents".format(len(documents)))
-print("Time taken to load documents: ", tok-tik)
+print("Time taken to load documents: ", tok - tik)
 
 # Add metadata to documents
 for document in documents:
-    document.metadata['filename'] = document.metadata['source']
+    document.metadata["filename"] = document.metadata["source"]
 
 
 # generator with openai models
@@ -43,15 +44,17 @@ embeddings = OpenAIEmbeddings()
 # print(generator_llm("What is the capital of India?"))
 # print(critic_llm("What is the capital of India?"))
 
-generator = TestsetGenerator.from_langchain(
-    generator_llm,
-    critic_llm,
-    embeddings
-)
+generator = TestsetGenerator.from_langchain(generator_llm, critic_llm, embeddings)
 
 
 async def generate_testset():
-    return generator.generate_with_langchain_docs(documents, test_size=total_questions, distributions=distributions, run_config=RunConfig())
+    return generator.generate_with_langchain_docs(
+        documents,
+        test_size=total_questions,
+        distributions=distributions,
+        run_config=RunConfig(),
+    )
+
 
 distributions = {simple: 0.5, reasoning: 0.25, multi_context: 0.25}
 loop = asyncio.new_event_loop()
@@ -67,4 +70,4 @@ finally:
     # Close the loop
     loop.close()
 tok = time.time()
-print("Time taken to generate testset: ", tok-tik)
+print("Time taken to generate testset: ", tok - tik)
