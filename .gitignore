@@ -1,9 +1,10 @@
 data.db
 *.pyc
+*.pdf
 *.lock
 *.db
 .env
-data
 /question_answer.csv
 /score.csv
 /testset.csv
+venv

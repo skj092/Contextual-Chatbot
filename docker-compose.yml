@@ -1,0 +1,5 @@
+services:
+  web:
+    build: .
+    ports:
+      - "52207:52207"

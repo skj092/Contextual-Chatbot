@@ -1,3 +1,57 @@
+# setup with docker
+```bash
+docker-compose up
+```
+
+# Setup without docker
+
+1. Create a virtual environment
+
+```bash
+python -m venv .venv
+```
+
+2. activate the virtual environment
+
+```bash
+source .venv/bin/activate
+```
+
+3. Install the dependencies
+
+```bash
+pip install -r requirement.txt
+```
+
+4. Run the application
+
+```bash
+sh startup.sh
+```
+
+# Generate the test data
+
+1. keep all the pdf in the /data/pdf folder
+2. python evaluation/systhetic_data_generation.py
+3. python evaluation/eval.py
+
+python evaluation/synthetic_data_generate.py --pdf_directory="data/pdfs" --num_questions=12
+
+
+```
+{
+    "chunk_size": 1000,
+    "model_name": "all-MiniLM-L6-v2",
+    "embedding_dim": 384,
+    "top_k": 3,
+    "retrival_model": "openai"
+}
+```
+currently 3 retrival_models are available - 1. "gpt-neo", "ollama" and "openai"
+To Use ollama need to setup ollama locally
+To Use openai need to setup api key in the environment
+
+
 # TODO
 - [x] Flow: pdf -> Extract Text -> Chunking -> Embedding -> Save to DB -> query -> Embedding -> Search in DB -> Retrieve Chunks -> Generate Response
 - [x] Build a boilerplate application
@@ -6,24 +60,20 @@
 - [x] Setup evaluation pipeline
 - [x] Prepare question answer pairs for evaluation
 - [ ] Setup mlops pipeline, versioning:
-    - [ ] Things to track (Store in DB)
-        - [ ] Chunk Size
-        - [ ] Embedding Model name
-        - [ ] Embedding dimension
+    - [x] Things to track (Store in DB)
+        - [x] Chunk Size
+        - [x] Embedding Model name
+        - [x] Embedding dimension
     - [ ] Things to track (Retrieve):
-        - [ ] LLM model name
+        - [x] LLM model name
         - [ ] Latency
         - [ ] Accuracy
         - [ ] Cost
-
 - [ ] Streaming response setup
 
 ------------
-1. To Use Openai model set the openai key
+1. To Use Openai model set the openai key as an environment variable
 2. To use ollama locally, install and run the ollama locally
-
-
-
 
 -----------------------
 - Unit Testing Response
@@ -31,42 +81,11 @@
 - ollama(llama 2.1) - accuracy good, response time - 30s, token/s = 1.9
 - gpt4o-mini- accuracy good, response time 4.6s, token/s = 10.6
 
-## Using RAGAS ( https://arxiv.org/pdf/2309.15217)
-https://docs.ragas.io/en/latest/concepts/metrics/index.html#different-types-of-metrics
-
 
 ## Steps for new pdf
 1. Run `python evaluation/systhetic_data_generation.py` to generate the synthetic test question-answer pairs.
 2. Run the service and then `python evaluation/eval.py` to evaluate the service accuracy.
 
-Problem Statement - Contextual Chat Bot:
-
-Mandatory Requirements:
-Simple Contextual Chat Bot Document Parsing: Read and process a long PDF/Word document.
-
-Contextual Chatbot:
-Answer questions using the document, responding with "I don't know the answer" if no relevant answer is found.
-
-Simple Interface: Provide a basic interface for document upload and querying.
-Performance Evaluation: Propose a method to evaluate model performance in production.
-FastAPI Integration: Develop a REST API with endpoints for document upload and querying using FastAPI.
-MLOps Pipeline: Propose an end-to-end MLOps pipeline using draw.io, including model versioning, monitoring, and retraining.
-
-Documentation: Include a README with setup instructions.
-
-Advanced Challenge (Bonus Points):
-Open Source LLMs: Use an open-source LLM instead of OpenAI (e.g., GPT-Neo, LLAMA).
-Document Chunking: Split the document into chunks and store in a vector database (e.g., Milvus).
-Semantic Search: Retrieve top 3 relevant chunks using semantic similarity search.
-Performance Evaluation: Implement a method to evaluate chatbot performance (e.g., accuracy). Share the report as well
-Pipeline management: Propose a method to create and manage data pipelines assuming you bring above use cases to production and have to inference it by sharing a document
-
-How to submit the code?
-
-Create a new GitHub repository with name : qp-ai-assessment
-Once you are ready with the code, you can come back on this URL to submit the GitHub Repo Link.
-
-----------------
 
 # Contextual Chatbot
 
@@ -90,37 +109,6 @@ This project implements a contextual chatbot that can answer questions based on 
 ## API Endpoints
 
 - `POST /upload`: Upload and process a document (PDF or DOCX)
-- `POST /query`: Submit a query and get a response from the chatbot
-
-## Performance Evaluation
-
-The system logs various metrics for performance evaluation:
-- Response time
-- Query relevance (based on semantic similarity)
-- User feedback (to be implemented)
-
-To view the logs and metrics, check the console output of the FastAPI application.
-
-## MLOps Pipeline
-
-The project includes an end-to-end MLOps pipeline for model versioning, monitoring, and retraining. The pipeline consists of the following stages:
-
-1. Data Collection
-2. Data Preprocessing
-3. Feature Engineering
-
-
-# References:
-- https://milvus.io/docs/quickstart.md
-
-
-# Files to Track using dvc
-1. testset.csv -> evaluation/systhetic_data_generation.py -> Generate the question answer pairs (GT)
-2. question_answer.csv -> Intermediary file
-3. score.csv -> evaluation/eval.py -> predict and answer and evaluate the model by comparing with GT.
-4. config.json -> config.py -> Store the configuration
-
-
 
 # ML Ops Cycle
 
@@ -129,3 +117,16 @@ New pdf -> Generate QA pairs -> Evaluate -> Update the config -> Evaluate
 2. Evaluate (evaluation/eval.py)
 3. Check the score (score.csv) and update the config (config.py)
 4. Repeat 2 and 3
+
+# Files to Track using dvc
+1. testset.csv -> evaluation/systhetic_data_generation.py -> Generate the question answer pairs (GT)
+2. question_answer.csv -> Intermediary file
+3. score.csv -> evaluation/eval.py -> predict and answer and evaluate the model by comparing with GT.
+4. config.json -> config.py -> Store the configuration
+
+
+# References:
+- Vector DB: https://milvus.io/docs/quickstart.md
+- RAGAS : https://arxiv.org/pdf/2309.15217)
+
+

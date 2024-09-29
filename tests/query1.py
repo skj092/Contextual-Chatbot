@@ -1,7 +1,7 @@
 import requests
 import time
 
-url = "http://127.0.0.1:8000/query"
+url = "http://0.0.0.0:52207/query"
 
 question = "who is sonu?"
 # Your query text
